@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sri Valli Kalyana Mandapam</title>
+<meta name="description" content="Sri Valli Kalyana Mandapam – Premier wedding venue for unforgettable celebrations."/>
+<meta name="keywords" content="kalyana mandapam, wedding hall, marriage hall, event venue"/>
+<meta name="theme-color" content="#6B0F1A"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/12.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore-compat.js"></script>
+<style>
+/* =====================================================
+   TOKENS
+===================================================== */
+:root{
+  --saffron:   #E07B39;
+  --saffron-dk:#B85A1A;
+  --maroon:    #6B0F1A;
+  --maroon-lt: #8B1A2A;
+  --gold:      #C9A84C;
+  --gold-lt:   #E8CB7A;
+  --ivory:     #FFF8EE;
+  --ivory-dk:  #F5ECD8;
+  --ivory-dkr: #EDE0C8;
+  --ink:       #1C1008;
+  --ink-mid:   #4A3728;
+  --ink-lt:    #8A7060;
+  --fa: 'Abril Fatface', cursive;
+  --fl: 'Lora', Georgia, serif;
+  --fn: 'Nunito', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:var(--fl);
+  background:var(--ivory);
+  color:var(--ink);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+
+/* =====================================================
+   TEXTURE OVERLAY
+===================================================== */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+
+/* =====================================================
+   LOADER
+===================================================== */
+#loader{
+  position:fixed;inset:0;
+  background:var(--maroon);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity .8s ease, visibility .8s ease;
+}
+#loader.out{opacity:0;visibility:hidden;pointer-events:none}
+.ld-title{
+  font-family:var(--fa);
+  font-size:clamp(1.8rem,6vw,3rem);
+  color:var(--gold-lt);
+  letter-spacing:.04em;
+  text-align:center;
+  margin-bottom:20px;
+  padding:0 20px;
+}
+.ld-bar{
+  width:160px;height:2px;
+  background:rgba(232,203,122,.2);
+  border-radius:2px;overflow:hidden;
+}
+.ld-fill{
+  height:100%;width:0%;
+  background:var(--gold-lt);
+  animation:load 1.8s ease forwards;
+}
+@keyframes load{to{width:100%}}
+
+/* =====================================================
+   NAV — top strip
+===================================================== */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 6%;height:62px;
+  transition:background .4s,box-shadow .4s;
+}
+#nav.bg{
+  background:rgba(107,15,26,.96);
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 20px rgba(0,0,0,.2);
+}
+.nl{
+  font-family:var(--fa);
+  font-size:1.1rem;
+  color:var(--gold-lt);
+  letter-spacing:.03em;
+}
+.nm{display:flex;gap:2.2rem;list-style:none}
+.nm a{
+  font-family:var(--fn);
+  font-size:.72rem;letter-spacing:.2em;
+  text-transform:uppercase;font-weight:600;
+  color:rgba(255,255,255,.75);
+  transition:color .2s;
+}
+.nm a:hover{color:var(--gold-lt)}
+.nb{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
+.nb span{display:block;width:22px;height:1.5px;background:var(--gold-lt)}
+
+/* =====================================================
+   HERO — big editorial split
+===================================================== */
+#hero{
+  min-height:100vh;
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+}
+.hero-left{
+  background:var(--maroon);
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:120px 8% 80px 8%;
+  position:relative;overflow:hidden;
+}
+.hero-left::after{
+  content:'';
+  position:absolute;
+  top:0;bottom:0;right:-60px;
+  width:120px;
+  background:var(--maroon);
+  transform:skewX(-4deg);
+  z-index:2;
+}
+/* big background number */
+.hero-left-bg{
+  position:absolute;
+  font-family:var(--fa);
+  font-size:30vw;
+  color:rgba(255,255,255,.025);
+  right:-2vw;top:50%;
+  transform:translateY(-50%);
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+.hero-tag{
+  font-family:var(--fn);
+  font-size:.68rem;letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--saffron);
+  margin-bottom:1.4rem;
+  display:flex;align-items:center;gap:12px;
+  opacity:0;animation:fadeUp .7s .2s forwards;
+}
+.hero-tag::before{content:'';width:28px;height:1px;background:var(--saffron)}
+.h1{
+  font-family:var(--fa);
+  font-size:clamp(3rem,6vw,5.5rem);
+  color:#fff;
+  line-height:1.02;
+  margin-bottom:1.4rem;
+  opacity:0;animation:fadeUp .7s .35s forwards;
+}
+.h1 span{
+  display:block;
+  color:var(--gold-lt);
+  font-size:clamp(1.4rem,3vw,2.4rem);
+}
+.hero-rule{
+  width:56px;height:3px;
+  background:var(--saffron);
+  margin-bottom:1.6rem;
+  opacity:0;animation:fadeUp .7s .45s forwards;
+}
+.hero-sub{
+  font-family:var(--fl);
+  font-size:1.05rem;
+  font-style:italic;
+  color:rgba(255,255,255,.65);
+  line-height:1.85;
+  margin-bottom:2.4rem;
+  max-width:400px;
+  opacity:0;animation:fadeUp .7s .55s forwards;
+}
+.hero-btns{
+  display:flex;gap:12px;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .7s .7s forwards;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--fn);font-size:.78rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:14px 28px;border:none;cursor:pointer;
+  transition:all .3s ease;border-radius:0;
+}
+.btn-saffron{
+  background:var(--saffron);color:#fff;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  box-shadow:0 4px 20px rgba(224,123,57,.4);
+}
+.btn-saffron:hover{background:var(--saffron-dk);transform:translateY(-2px)}
+.btn-hollow{
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,.35);
+  color:rgba(255,255,255,.8);
+}
+.btn-hollow:hover{border-color:var(--gold-lt);color:var(--gold-lt)}
+
+.hero-right{
+  background:var(--ivory-dk);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  z-index:1;
+}
+/* Big decorative mandala SVG */
+.hero-deco{
+  position:absolute;
+  width:min(90%,520px);
+  height:min(90%,520px);
+  opacity:.12;
+}
+.hero-badges{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;gap:20px;
+  padding:40px;
+}
+.hbadge{
+  background:#fff;
+  border-left:4px solid var(--saffron);
+  padding:20px 24px;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);
+  opacity:0;animation:fadeRight .7s forwards;
+}
+.hbadge:nth-child(1){animation-delay:.5s}
+.hbadge:nth-child(2){animation-delay:.7s;margin-left:32px}
+.hbadge:nth-child(3){animation-delay:.9s}
+.hb-num{
+  font-family:var(--fa);font-size:2.4rem;
+  color:var(--maroon);line-height:1;
+}
+.hb-label{font-family:var(--fn);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-lt);margin-top:3px}
+
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;
+  transform:translateX(-50%);
+  writing-mode:vertical-lr;
+  font-family:var(--fn);font-size:.62rem;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);
+  display:flex;align-items:center;gap:8px;
+  opacity:0;animation:fadeUp .8s 1.2s forwards;
+  z-index:10;
+}
+.scroll-hint::after{
+  content:'';width:1px;height:40px;
+  background:linear-gradient(to bottom,rgba(255,255,255,.4),transparent);
+}
+
+/* =====================================================
+   MARQUEE STRIP
+===================================================== */
+.marquee-strip{
+  background:var(--saffron);
+  padding:14px 0;overflow:hidden;
+  position:relative;z-index:5;
+}
+.marquee-track{
+  display:flex;gap:0;
+  animation:marquee 22s linear infinite;
+  width:max-content;
+}
+.marquee-item{
+  font-family:var(--fn);font-size:.75rem;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:#fff;padding:0 40px;white-space:nowrap;
+}
+.marquee-item::before{content:'✦';margin-right:40px;opacity:.6}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* =====================================================
+   ABOUT — editorial layout
+===================================================== */
+#about{
+  padding:100px 6%;
+  background:var(--ivory);
+  position:relative;
+}
+.about-grid{
+  max-width:1200px;margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:80px;align-items:start;
+}
+.about-aside{
+  position:sticky;top:100px;
+}
+.a-num{
+  font-family:var(--fa);
+  font-size:8rem;line-height:.85;
+  color:var(--ivory-dkr);
+  margin-bottom:16px;
+}
+.a-label{
+  font-family:var(--fn);
+  font-size:.72rem;letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--saffron);
+  margin-bottom:12px;
+}
+.a-title{
+  font-family:var(--fa);
+  font-size:clamp(1.8rem,3.5vw,2.8rem);
+  color:var(--maroon);
+  line-height:1.15;
+}
+.a-deco{
+  width:48px;height:3px;
+  background:var(--saffron);
+  margin:20px 0;
+}
+.about-main{}
+.about-body{
+  font-family:var(--fl);
+  font-size:1.1rem;
+  color:var(--ink-mid);
+  line-height:2;
+  margin-bottom:2.5rem;
+}
+.about-body p+p{margin-top:1.2rem}
+/* Pull quote */
+.pullquote{
+  border-left:4px solid var(--gold);
+  padding:20px 28px;
+  background:var(--ivory-dk);
+  margin:2.5rem 0;
+}
+.pullquote-text{
+  font-family:var(--fa);
+  font-size:1.4rem;
+  color:var(--maroon);
+  line-height:1.4;
+}
+.pullquote-attr{
+  font-family:var(--fn);font-size:.72rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-lt);margin-top:10px;
+}
+/* Feature grid */
+.features{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-top:2rem;
+}
+.feat{
+  background:var(--ivory-dk);
+  padding:20px 18px;
+  border-top:3px solid var(--maroon);
+  transition:transform .3s,box-shadow .3s;
+}
+.feat:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(107,15,26,.1)}
+.feat-icon{font-size:1.6rem;margin-bottom:10px}
+.feat-name{font-family:var(--fl);font-size:.88rem;font-weight:600;color:var(--maroon)}
+.feat-desc{font-family:var(--fn);font-size:.75rem;color:var(--ink-lt);margin-top:4px}
+
+/* =====================================================
+   GALLERY — polaroid style
+===================================================== */
+#gallery{
+  padding:100px 6%;
+  background:var(--ivory-dk);
+  position:relative;
+}
+.gallery-head{
+  max-width:1200px;margin:0 auto 56px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.gh-left .g-num{font-family:var(--fa);font-size:5rem;color:var(--ivory-dkr);line-height:1}
+.gh-left .g-label{font-family:var(--fn);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--saffron);margin-bottom:8px}
+.gh-left .g-title{font-family:var(--fa);font-size:clamp(1.6rem,3vw,2.6rem);color:var(--maroon);line-height:1.15}
+.gh-rule{width:3px;height:80px;background:linear-gradient(to bottom,var(--saffron),transparent)}
+
+.gallery-masonry{
+  max-width:1200px;margin:0 auto;
+  columns:3;column-gap:20px;
+}
+.gitem{
+  break-inside:avoid;margin-bottom:20px;
+  background:#fff;
+  padding:10px 10px 32px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+  cursor:pointer;
+  transition:transform .4s ease,box-shadow .4s ease;
+  position:relative;
+}
+.gitem::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;transform:translateX(-50%);
+  width:60%;height:2px;
+  background:var(--saffron);
+  opacity:0;transition:opacity .3s;
+}
+.gitem:hover{transform:rotate(0deg) scale(1.03) translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.18)}
+.gitem:hover::after{opacity:1}
+.gitem img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+.gitem-cap{
+  font-family:var(--fn);font-size:.72rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-lt);
+  text-align:center;padding-top:12px;
+}
+.g-empty{
+  text-align:center;padding:80px;
+  font-family:var(--fl);font-style:italic;
+  color:var(--ink-lt);font-size:1.1rem;
+}
+
+/* Lightbox */
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+#lb.on{display:flex}
+#lb img{max-width:90vw;max-height:90vh;box-shadow:0 20px 80px rgba(0,0,0,.8)}
+#lb-close{
+  position:absolute;top:24px;right:32px;
+  background:none;border:none;cursor:pointer;
+  font-size:2rem;color:rgba(255,255,255,.5);
+  transition:color .2s;line-height:1;
+}
+#lb-close:hover{color:#fff}
+
+/* =====================================================
+   CONTACT — dramatic layout
+===================================================== */
+#contact{
+  padding:100px 6%;
+  background:var(--maroon);
+  position:relative;overflow:hidden;
+}
+/* big background word */
+.contact-bgword{
+  position:absolute;
+  font-family:var(--fa);font-size:22vw;
+  color:rgba(255,255,255,.025);
+  bottom:-4vw;right:-2vw;
+  line-height:1;pointer-events:none;user-select:none;
+}
+.contact-wrap{
+  max-width:1200px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.contact-header{margin-bottom:60px}
+.c-num{font-family:var(--fa);font-size:5rem;color:rgba(255,255,255,.06);line-height:1;margin-bottom:-16px}
+.c-label{font-family:var(--fn);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--saffron);margin-bottom:8px}
+.c-title{font-family:var(--fa);font-size:clamp(1.8rem,4vw,3.5rem);color:#fff;line-height:1.1}
+.c-title span{color:var(--gold-lt)}
+
+.contact-grid{
+  display:grid;grid-template-columns:1fr 1.8fr;gap:60px;
+}
+.contact-info{}
+/* Big phone display */
+.phone-display{
+  font-family:var(--fa);
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  color:var(--gold-lt);
+  margin-bottom:32px;
+  line-height:1.2;
+}
+.phone-display a{color:inherit;transition:color .2s}
+.phone-display a:hover{color:#fff}
+
+.cinfo-row{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:18px 0;border-top:1px solid rgba(255,255,255,.1);
+}
+.cinfo-icon{
+  width:40px;height:40px;
+  background:rgba(224,123,57,.2);border:1px solid rgba(224,123,57,.3);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;margin-top:2px;
+}
+.cinfo-label{font-family:var(--fn);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--saffron);margin-bottom:4px}
+.cinfo-val{font-family:var(--fl);font-size:1rem;color:rgba(255,255,255,.85)}
+.cinfo-val a{color:inherit;transition:color .2s}
+.cinfo-val a:hover{color:var(--gold-lt)}
+
+.contact-btns{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  box-shadow:0 4px 16px rgba(37,211,102,.3)}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.4)}
+.btn-phone{background:linear-gradient(135deg,var(--saffron),var(--saffron-dk));color:#fff;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  box-shadow:0 4px 16px rgba(224,123,57,.3)}
+.btn-phone:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(224,123,57,.4)}
+
+.map-wrapper{
+  position:relative;
+  height:420px;overflow:hidden;
+}
+.map-wrapper::before{
+  content:'';
+  position:absolute;
+  top:-12px;left:-12px;right:12px;bottom:12px;
+  border:2px solid var(--gold);
+  z-index:0;
+  opacity:.4;
+}
+.map-wrapper iframe{
+  position:absolute;inset:0;
+  width:100%;height:100%;border:none;
+  filter:sepia(30%) saturate(.8) brightness(.85);
+  z-index:1;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+footer{
+  background:#2A0508;
+  padding:48px 6% 32px;
+  position:relative;overflow:hidden;
+}
+footer::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.footer-grid{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:40px;align-items:center;
+  padding-bottom:32px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  margin-bottom:24px;
+}
+.foot-brand{}
+.foot-name{font-family:var(--fa);font-size:1.5rem;color:var(--gold);margin-bottom:6px}
+.foot-tag{font-family:var(--fl);font-style:italic;font-size:.88rem;color:rgba(255,255,255,.35)}
+.foot-center{text-align:center}
+.foot-ornament{font-family:var(--fa);font-size:2.5rem;color:rgba(201,168,76,.15);line-height:1}
+.foot-links{display:flex;gap:1.8rem;justify-content:flex-end;flex-wrap:wrap;list-style:none}
+.foot-links a{font-family:var(--fn);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3);transition:color .2s}
+.foot-links a:hover{color:var(--gold)}
+.foot-copy{text-align:center;font-family:var(--fn);font-size:.7rem;color:rgba(255,255,255,.15);letter-spacing:.06em}
+
+/* =====================================================
+   REVEAL ANIMATIONS
+===================================================== */
+.rv{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease}
+.rv.in{opacity:1;transform:translateY(0)}
+.rv-left{opacity:0;transform:translateX(-40px);transition:opacity .8s ease,transform .8s ease}
+.rv-left.in{opacity:1;transform:translateX(0)}
+.rv-right{opacity:0;transform:translateX(40px);transition:opacity .8s ease,transform .8s ease}
+.rv-right.in{opacity:1;transform:translateX(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media(max-width:960px){
+  #hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left::after{display:none}
+  .about-grid{grid-template-columns:1fr;gap:40px}
+  .about-aside{position:relative;top:0}
+  .features{grid-template-columns:1fr 1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;text-align:center}
+  .foot-links{justify-content:center}
+}
+@media(max-width:640px){
+  .gallery-masonry{columns:1}
+  .nm{display:none}
+  .nm.open{display:flex;flex-direction:column;position:fixed;top:62px;left:0;right:0;background:rgba(107,15,26,.97);padding:28px 6%;gap:1.6rem}
+  .nb{display:flex}
+  .features{grid-template-columns:1fr}
+  .gallery-head{flex-direction:column;gap:20px;align-items:flex-start}
+  .contact-btns .btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-title">Sri Valli Kalyana Mandapam</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb" role="dialog" aria-modal="true">
+  <button id="lb-close" aria-label="Close">&#x2715;</button>
+  <img id="lb-img" src="" alt=""/>
+</div>
+
+<!-- NAV -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
+  <div class="nl">Sri Valli</div>
+  <ul class="nm" id="nm">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nb" id="nb" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ==============================
+     HERO
+============================== -->
+<section id="hero" aria-label="Welcome">
+  <div class="hero-left">
+    <div class="hero-left-bg" aria-hidden="true">V</div>
+    <div class="hero-tag">Premium Wedding Venue</div>
+    <h1 class="h1" id="hero-title">
+      Sri Valli<span>Kalyana Mandapam</span>
+    </h1>
+    <div class="hero-rule"></div>
+    <p class="hero-sub" id="hero-subtitle">
+      Where cherished traditions meet timeless elegance — your perfect wedding awaits.
+    </p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn btn-saffron" id="btn-call"><span>📞</span>Call Us Now</a>
+      <a href="#contact" class="btn btn-hollow" id="btn-whatsapp"><span>💬</span>WhatsApp</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <!-- Decorative mandala SVG -->
+    <svg class="hero-deco" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="250" cy="250" r="200" stroke="#C9A84C" stroke-width="1"/>
+      <circle cx="250" cy="250" r="160" stroke="#C9A84C" stroke-width="0.5"/>
+      <circle cx="250" cy="250" r="120" stroke="#C9A84C" stroke-width="1"/>
+      <circle cx="250" cy="250" r="80" stroke="#C9A84C" stroke-width="0.5"/>
+      <circle cx="250" cy="250" r="40" stroke="#C9A84C" stroke-width="1"/>
+      <line x1="50" y1="250" x2="450" y2="250" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="250" y1="50" x2="250" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="108" y1="108" x2="392" y2="392" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="392" y1="108" x2="108" y2="392" stroke="#C9A84C" stroke-width="0.5"/>
+      <polygon points="250,70 290,180 410,180 315,250 350,365 250,295 150,365 185,250 90,180 210,180" stroke="#C9A84C" stroke-width="1" fill="none"/>
+      <polygon points="250,130 275,200 350,200 292,242 315,315 250,270 185,315 208,242 150,200 225,200" stroke="#C9A84C" stroke-width="0.5" fill="none"/>
+      <circle cx="250" cy="250" r="8" fill="#C9A84C" opacity="0.5"/>
+      <circle cx="250" cy="50" r="4" fill="#C9A84C" opacity="0.4"/>
+      <circle cx="250" cy="450" r="4" fill="#C9A84C" opacity="0.4"/>
+      <circle cx="50" cy="250" r="4" fill="#C9A84C" opacity="0.4"/>
+      <circle cx="450" cy="250" r="4" fill="#C9A84C" opacity="0.4"/>
+    </svg>
+    <div class="hero-badges">
+      <div class="hbadge"><div class="hb-num">500+</div><div class="hb-label">Celebrations Hosted</div></div>
+      <div class="hbadge"><div class="hb-num">1000</div><div class="hb-label">Seating Capacity</div></div>
+      <div class="hbadge"><div class="hb-num">25+</div><div class="hb-label">Years of Excellence</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">Scroll Down</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item">Weddings</span>
+    <span class="marquee-item">Receptions</span>
+    <span class="marquee-item">Engagements</span>
+    <span class="marquee-item">Family Celebrations</span>
+    <span class="marquee-item">Corporate Events</span>
+    <span class="marquee-item">Naming Ceremonies</span>
+    <span class="marquee-item">Weddings</span>
+    <span class="marquee-item">Receptions</span>
+    <span class="marquee-item">Engagements</span>
+    <span class="marquee-item">Family Celebrations</span>
+    <span class="marquee-item">Corporate Events</span>
+    <span class="marquee-item">Naming Ceremonies</span>
+  </div>
+</div>
+
+<!-- ==============================
+     ABOUT
+============================== -->
+<section id="about" aria-label="About">
+  <div class="about-grid">
+    <div class="about-aside rv-left">
+      <div class="a-num">01</div>
+      <div class="a-label">About Us</div>
+      <h2 class="a-title">Our Story</h2>
+      <div class="a-deco"></div>
+    </div>
+    <div class="about-main rv">
+      <p class="about-body" id="about-text">Loading…</p>
+      <div class="pullquote">
+        <div class="pullquote-text">Every celebration deserves a stage worthy of its story.</div>
+        <div class="pullquote-attr">— Sri Valli Kalyana Mandapam</div>
+      </div>
+      <div class="features">
+        <div class="feat"><div class="feat-icon">🌸</div><div class="feat-name">Bridal Suite</div><div class="feat-desc">Exclusive preparation rooms</div></div>
+        <div class="feat"><div class="feat-icon">🍽️</div><div class="feat-name">Catering Setup</div><div class="feat-desc">Full kitchen infrastructure</div></div>
+        <div class="feat"><div class="feat-icon">💡</div><div class="feat-name">Lighting & Décor</div><div class="feat-desc">Professional staging</div></div>
+        <div class="feat"><div class="feat-icon">🅿️</div><div class="feat-name">Ample Parking</div><div class="feat-desc">Spacious vehicle area</div></div>
+        <div class="feat"><div class="feat-icon">❄️</div><div class="feat-name">Air Conditioned</div><div class="feat-desc">Full hall climate control</div></div>
+        <div class="feat"><div class="feat-icon">🎶</div><div class="feat-name">Sound System</div><div class="feat-desc">Pro audio throughout</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     GALLERY
+============================== -->
+<section id="gallery" aria-label="Photo Gallery">
+  <div class="gallery-head rv">
+    <div class="gh-left">
+      <div class="g-label">Our Venue</div>
+      <div class="g-num">02</div>
+      <div class="g-title">A Glimpse<br/>Inside</div>
+    </div>
+    <div class="gh-rule"></div>
+  </div>
+  <div class="gallery-masonry" id="gallery-grid"></div>
+</section>
+
+<!-- ==============================
+     CONTACT
+============================== -->
+<section id="contact" aria-label="Contact">
+  <div class="contact-bgword" aria-hidden="true">Book</div>
+  <div class="contact-wrap">
+    <div class="contact-header rv">
+      <div class="c-label">Get In Touch</div>
+      <div class="c-num">03</div>
+      <h2 class="c-title">Let's Plan<br/>Your <span>Dream Day</span></h2>
+    </div>
+    <div class="contact-grid">
+      <div class="rv-left">
+        <div class="phone-display"><a id="phone-link" href="tel:">Loading…</a></div>
+        <div class="cinfo-row">
+          <div class="cinfo-icon">📞</div>
+          <div><div class="cinfo-label">Phone / WhatsApp</div><div class="cinfo-val"><a id="phone-link2" href="tel:">Loading…</a></div></div>
+        </div>
+        <div class="cinfo-row">
+          <div class="cinfo-icon">📍</div>
+          <div><div class="cinfo-label">Location</div><div class="cinfo-val">Find us on Google Maps</div></div>
+        </div>
+        <div class="cinfo-row">
+          <div class="cinfo-icon">🕐</div>
+          <div><div class="cinfo-label">Availability</div><div class="cinfo-val">Open all 7 days · Enquire anytime</div></div>
+        </div>
+        <div class="contact-btns">
+          <a id="cta-call" href="tel:" class="btn btn-phone"><span>📞</span>Call Now</a>
+          <a id="cta-wa"   href="#" class="btn btn-wa" target="_blank" rel="noopener"><span>💬</span>Chat on WhatsApp</a>
+        </div>
+      </div>
+      <div class="rv-right">
+        <div class="map-wrapper">
+          <iframe src="https://maps.google.com/maps?q=Sri+Valli+Kalyana+Mandapam&output=embed"
+            allowfullscreen loading="lazy" title="Sri Valli Kalyana Mandapam location"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="foot-brand">
+      <div class="foot-name">Sri Valli Kalyana Mandapam</div>
+      <div class="foot-tag">Where Love Finds Its Perfect Stage</div>
+    </div>
+    <div class="foot-center">
+      <div class="foot-ornament">✦</div>
+    </div>
+    <ul class="foot-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+  <div class="foot-copy">© <span id="yr"></span> Sri Valli Kalyana Mandapam. All rights reserved.</div>
+</footer>
+
+<!-- FIREBASE -->
+<script>
+const firebaseConfig = {
+  apiKey:            "AIzaSyA6P3RMek8ygooiEKEmx6TTD_1Dj3mmiPw",
+  authDomain:        "sri-valli-kalyana-mandapam.firebaseapp.com",
+  projectId:         "sri-valli-kalyana-mandapam",
+  storageBucket:     "sri-valli-kalyana-mandapam.firebasestorage.app",
+  messagingSenderId: "286351638984",
+  appId:             "1:286351638984:web:505a7f7bf7d36be8e4c0fd",
+  measurementId:     "G-KZ811J00SH"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Scroll reveal
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, {threshold: 0.1});
+document.querySelectorAll('.rv,.rv-left,.rv-right').forEach(el => ro.observe(el));
+
+// Navbar
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('bg', window.scrollY > 60));
+
+// Mobile menu
+const nb = document.getElementById('nb'), nm = document.getElementById('nm');
+nb.addEventListener('click', () => nm.classList.toggle('open'));
+document.querySelectorAll('.nm a').forEach(a => a.addEventListener('click', () => nm.classList.remove('open')));
+
+// Lightbox
+const lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img');
+document.getElementById('lb-close').addEventListener('click', closeLB);
+lb.addEventListener('click', e => { if(e.target === lb) closeLB(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLB(); });
+function closeLB(){ lb.classList.remove('on'); document.body.style.overflow = ''; }
+function openLB(src){ lbImg.src = src; lb.classList.add('on'); document.body.style.overflow = 'hidden'; }
+
+// Gallery
+function renderGallery(imgs) {
+  const g = document.getElementById('gallery-grid');
+  g.innerHTML = '';
+  if (!imgs || !imgs.length) {
+    g.innerHTML = '<p class="g-empty">No images yet — check back soon!</p>';
+    return;
+  }
+  imgs.forEach((url, i) => {
+    const d = document.createElement('div');
+    d.className = 'gitem rv';
+    d.innerHTML = `<img src="${url}" alt="Gallery ${i+1}" loading="lazy"/><div class="gitem-cap">Sri Valli · Photo ${i+1}</div>`;
+    d.addEventListener('click', () => openLB(url));
+    g.appendChild(d);
+    ro.observe(d);
+  });
+}
+
+// Phone
+function setPhone(ph) {
+  const c = ph.replace(/\s+/g, '');
+  ['phone-link','phone-link2'].forEach(id => {
+    document.getElementById(id).textContent = ph;
+    document.getElementById(id).href = 'tel:' + c;
+  });
+  document.getElementById('cta-call').href = 'tel:' + c;
+  document.getElementById('cta-wa').href = 'https://wa.me/' + c.replace('+','');
+  document.getElementById('btn-call').href = 'tel:' + c;
+  document.getElementById('btn-whatsapp').href = 'https://wa.me/' + c.replace('+','');
+}
+
+// Firestore live
+db.collection('siteContent').doc('main').onSnapshot(snap => {
+  const d = snap.exists ? snap.data() : {};
+  if (d.title) {
+    const p = d.title.split(' ');
+    document.getElementById('hero-title').innerHTML = p.slice(0,2).join(' ') + '<span>' + p.slice(2).join(' ') + '</span>';
+  }
+  if (d.subtitle) document.getElementById('hero-subtitle').textContent = d.subtitle;
+  if (d.about)    document.getElementById('about-text').textContent = d.about;
+  if (d.phone)    setPhone(d.phone);
+  renderGallery(d.images || []);
+  document.getElementById('loader').classList.add('out');
+}, err => {
+  console.error(err);
+  document.getElementById('loader').classList.add('out');
+});
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
